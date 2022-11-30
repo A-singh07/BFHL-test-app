@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, Text } from 'react-native';
 
-const InputField = ({ label, placeholder, value, error, ...rest }) => {
+const InputField = ({ label, placeholder, value, error, helperText, ...rest }) => {
   return (
     <View style={styles.container}>
       <TextInput
@@ -14,13 +14,17 @@ const InputField = ({ label, placeholder, value, error, ...rest }) => {
         ]}
         {...rest}
       />
+      {
+        helperText &&
+        <Text style={styles.helperText}>{helperText}</Text>
+      }
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 18
+    marginBottom: 16
   },
   label: {
     marginBottom: 8,
@@ -51,6 +55,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
     paddingVertical: 2,
     height: 20
+  },
+  helperText: {
+    fontSize: 12,
+    color: '#a7a7a7',
+    height: 18,
+    marginTop: 6,
+    marginLeft: 8
   }
 })
 

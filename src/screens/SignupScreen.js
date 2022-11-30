@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Alert } from 'react-native';
 import * as Yup from 'yup';
-import { MotiView } from 'moti'
+import { MotiView } from 'moti';
+import moment from 'moment';
 import InputField from '../components/InputField';
 import Button from '../components/Button';
 
@@ -10,7 +11,7 @@ const SignupScreen = ({ navigation }) => {
   // Form Schema
   let schema = Yup.object().shape({
     name: Yup.string().required("Required full name"),
-    age: Yup.number().required("Required age").min(18, "Min age must be 18"),
+    dob: Yup.string().required(),
     email: Yup.string().email("Invalid email").required("Required email"),
     password: Yup.string()
       .min(8, "at least 8 characters required")
@@ -22,23 +23,45 @@ const SignupScreen = ({ navigation }) => {
 
   const [formData, setFormData] = useState({
     name: '',
-    age: 0,
+    dob: '',
     email: '',
     password: '',
     cnfPassword: '',
   })
+  const [showErrors, setShowErrors] = useState([]);
+
+  const [dob, setDob] = useState({
+    date: 0,
+    month: 0,
+    year: 0
+  })
+  const [age, setAge] = useState(0)
+
+  useEffect(() => {
+    if (!(dob.date && dob.month && dob.year.length === 4)) return
+
+    const dobInput = `${dob.date}/${dob.month}/${dob.year}`
+    setFormData({ ...formData, dob: dobInput })
+
+    const ageCalc = moment(dobInput, "DD/MM/YYYY").fromNow(true)
+    setAge(ageCalc);
+  }, [dob])
 
   const handleSignup = () => {
+    // schema.isValid(formData)
+    //   .then(res => {
+    //     if (!res) return setShowErrors("Invalid inputs")
+    //     Alert.alert("Signup successful!")
+    //     navigation.navigate('Login')
+    //   })
 
     schema.validate(formData)
       .then((value) => {
-        // console.log("Value:", value)
-        Alert.alert('Signup successful! Please login')
+        Alert.alert("Signup successful!")
         navigation.navigate('Login')
       })
       .catch(err => {
-        Alert.alert("Fill the form correctly!")
-        // console.log("Error:", JSON.parse(JSON.stringify(err.inner)))
+        setShowErrors(err.errors)
       })
 
   }
@@ -54,6 +77,7 @@ const SignupScreen = ({ navigation }) => {
           <InputField
             placeholder={"Name"}
             value={formData.name}
+            error={showErrors.length > 0}
             onChangeText={name => setFormData({ ...formData, name: name })}
           />
         </MotiView>
@@ -62,12 +86,40 @@ const SignupScreen = ({ navigation }) => {
           animate={{ left: 0, opacity: 1 }}
           delay={70}
         >
-          <InputField
-            placeholder={"Age"}
-            value={formData.age}
-            keyboardType={'numeric'}
-            onChangeText={age => setFormData({ ...formData, age: age })}
-          />
+          <Text style={styles.dobHeading}>Date of Birth</Text>
+          <View style={styles.dobContainer}>
+            <View style={styles.dobItem}>
+              <InputField
+                placeholder={"Date"}
+                value={dob.date}
+                keyboardType={'numeric'}
+                maxLength={2}
+                helperText={`Age: ${age}`}
+                error={showErrors.length > 0}
+                onChangeText={num => setDob({ ...dob, date: num })}
+              />
+            </View>
+            <View style={styles.dobItem}>
+              <InputField
+                placeholder={"Month"}
+                value={dob.month}
+                keyboardType={'numeric'}
+                maxLength={2}
+                error={showErrors.length > 0}
+                onChangeText={num => setDob({ ...dob, month: num })}
+              />
+            </View>
+            <View style={styles.dobItem}>
+              <InputField
+                placeholder={"Year"}
+                value={dob.year}
+                keyboardType={'numeric'}
+                maxLength={4}
+                error={showErrors.length > 0}
+                onChangeText={num => setDob({ ...dob, year: num })}
+              />
+            </View>
+          </View>
         </MotiView>
         <MotiView
           from={{ left: 100, opacity: 0 }}
@@ -79,6 +131,7 @@ const SignupScreen = ({ navigation }) => {
             value={formData.email}
             textContentType={'emailAddress'}
             keyboardType={"email-address"}
+            error={showErrors.length > 0}
             onChangeText={email => setFormData({ ...formData, email: email })}
           />
         </MotiView>
@@ -92,6 +145,7 @@ const SignupScreen = ({ navigation }) => {
             value={formData.password}
             textContentType={"password"}
             secureTextEntry={true}
+            error={showErrors.length > 0}
             onChangeText={pass => setFormData({ ...formData, password: pass })}
           />
         </MotiView>
@@ -105,9 +159,15 @@ const SignupScreen = ({ navigation }) => {
             value={formData.cnfPassword}
             textContentType={"password"}
             secureTextEntry={true}
+            error={showErrors.length > 0}
             onChangeText={pass => setFormData({ ...formData, cnfPassword: pass })}
           />
         </MotiView>
+        {
+          showErrors.map((error, i) =>
+            <Text key={i} style={styles.errorMsg}>{error}</Text>
+          )
+        }
       </View>
 
       <Button
@@ -143,7 +203,7 @@ const styles = StyleSheet.create({
     marginBottom: 32
   },
   text: {
-    marginTop: 150,
+    marginTop: 100,
     textAlign: 'center',
     fontSize: 18,
     color: '#4B4B4B',
@@ -156,7 +216,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textDecorationLine: 'underline',
     color: '#7B5BA8'
-  }
+  },
+  dobHeading: {
+    color: '#a7a7a7',
+    marginBottom: 5
+  },
+  dobContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  dobItem: {
+    width: '30%'
+  },
+  errorMsg: {
+    color: 'red',
+    marginBottom: 8,
+    marginLeft: 10
+  },
 })
 
 export default SignupScreen

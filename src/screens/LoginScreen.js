@@ -23,28 +23,31 @@ const LoginScreen = ({ navigation, ...rest }) => {
     password: '',
   })
 
-  const [showErrors, setShowErrors] = useState('');
+  const [showErrors, setShowErrors] = useState([]);
 
   const handleLogin = () => {
-    schema.isValid(formData)
-      .then(res => {
-        if (!res) return setShowErrors("Invalid email and password")
+    // schema.isValid(formData)
+    //   .then(res => {
+    //     if (!res) return setShowErrors("Invalid email and password")
+    //     const data = {
+    //       ...formData,
+    //       token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
+    //     }
+    //     dispatch({ type: 'AUTH_USER', payload: data })
+    //   })
+
+    schema.validate(formData)
+      .then((value) => {
         const data = {
-          ...formData,
+          ...value,
           token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
         }
         dispatch({ type: 'AUTH_USER', payload: data })
       })
-
-
-    // schema.validate(formData)
-    //   .then((value) => {
-    //     
-    //   })
-    //   .catch(err => {
-    //     Alert.alert("All fields required!")
-    //     // console.log("Error:", JSON.parse(JSON.stringify(err.inner)))
-    //   })
+      .catch(err => {
+        setShowErrors(err.errors)
+        // console.log("Error:", JSON.parse(JSON.stringify(err.inner)))
+      })
 
   }
 
@@ -66,7 +69,7 @@ const LoginScreen = ({ navigation, ...rest }) => {
             value={formData.email}
             textContentType={'emailAddress'}
             keyboardType={"email-address"}
-            error={showErrors !== '' && true}
+            error={showErrors.length > 0}
             onChangeText={email => setFormData({ ...formData, email: email })}
           />
         </MotiView>
@@ -80,11 +83,15 @@ const LoginScreen = ({ navigation, ...rest }) => {
             value={formData.password}
             textContentType={"password"}
             secureTextEntry={true}
-            error={showErrors !== '' && true}
+            error={showErrors.length > 0}
             onChangeText={pass => setFormData({ ...formData, password: pass })}
           />
         </MotiView>
-        <Text style={styles.errorMsg}>{showErrors}</Text>
+        {
+          showErrors.map((error, i) =>
+            <Text key={i} style={styles.errorMsg}>{error}</Text>
+          )
+        }
       </View>
 
       <Button
