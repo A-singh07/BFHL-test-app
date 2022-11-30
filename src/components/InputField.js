@@ -1,18 +1,19 @@
 import React from 'react';
 import { View, TextInput, StyleSheet, Text } from 'react-native';
 
-const InputField = ({ label, placeholder, value, ...rest }) => {
+const InputField = ({ label, placeholder, value, error, ...rest }) => {
   return (
     <View style={styles.container}>
-      {/* <Text style={styles.label}>{label}</Text> */}
       <TextInput
         placeholder={placeholder}
-        placeholderTextColor={'#D3D3D3'}
+        placeholderTextColor={'#c7c7c7'}
         value={value}
-        style={styles.input}
+        style={[
+          styles.input,
+          error && { borderColor: 'red', borderWidth: 1 }
+        ]}
         {...rest}
       />
-      {/* <Text style={styles.errorMsg}>{errorMsg}</Text> */}
     </View>
   )
 }
@@ -27,13 +28,19 @@ const styles = StyleSheet.create({
     color: 'black'
   },
   input: {
-    borderWidth: 1,
-    borderColor: '#8E8E8E',
+    backgroundColor: '#FAF9FF',
     fontSize: 16,
-    borderRadius: 50,
+    borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 18,
-    color: '#4B4B4B'
+    color: '#4B4B4B',
+    shadowColor: "#c7c7c7",
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.19,
+    elevation: 6
   },
   placeholderText: {
     color: '#4B4B4B'

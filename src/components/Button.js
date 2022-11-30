@@ -1,7 +1,7 @@
 import React from 'react';
 import { Text, Pressable, StyleSheet } from 'react-native';
 
-const Button = ({ text, onPress, small, secondary, customStyle }) => {
+const Button = ({ text, onPress, small, secondary, customStyle, ...rest }) => {
 
   return (
     <Pressable
@@ -13,6 +13,7 @@ const Button = ({ text, onPress, small, secondary, customStyle }) => {
         customStyle
       ]}
       onPress={onPress}
+      {...rest}
     >
       <Text style={[
         styles.btnText,

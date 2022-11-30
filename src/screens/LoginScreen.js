@@ -8,7 +8,7 @@ import InputField from '../components/InputField';
 import Button from '../components/Button';
 import loginLottie from '../assets/Login.json'
 
-const LoginScreen = ({ navigation }) => {
+const LoginScreen = ({ navigation, ...rest }) => {
 
   const dispatch = useDispatch();
 
@@ -23,19 +23,28 @@ const LoginScreen = ({ navigation }) => {
     password: '',
   })
 
+  const [showErrors, setShowErrors] = useState('');
+
   const handleLogin = () => {
-    schema.validate(formData)
-      .then((value) => {
+    schema.isValid(formData)
+      .then(res => {
+        if (!res) return setShowErrors("Invalid email and password")
         const data = {
-          ...value,
+          ...formData,
           token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"
         }
         dispatch({ type: 'AUTH_USER', payload: data })
       })
-      .catch(err => {
-        Alert.alert("All fields required!")
-        // console.log("Error:", JSON.parse(JSON.stringify(err.inner)))
-      })
+
+
+    // schema.validate(formData)
+    //   .then((value) => {
+    //     
+    //   })
+    //   .catch(err => {
+    //     Alert.alert("All fields required!")
+    //     // console.log("Error:", JSON.parse(JSON.stringify(err.inner)))
+    //   })
 
   }
 
@@ -57,6 +66,7 @@ const LoginScreen = ({ navigation }) => {
             value={formData.email}
             textContentType={'emailAddress'}
             keyboardType={"email-address"}
+            error={showErrors !== '' && true}
             onChangeText={email => setFormData({ ...formData, email: email })}
           />
         </MotiView>
@@ -70,14 +80,17 @@ const LoginScreen = ({ navigation }) => {
             value={formData.password}
             textContentType={"password"}
             secureTextEntry={true}
+            error={showErrors !== '' && true}
             onChangeText={pass => setFormData({ ...formData, password: pass })}
           />
         </MotiView>
+        <Text style={styles.errorMsg}>{showErrors}</Text>
       </View>
 
       <Button
         text={'Login'}
         onPress={handleLogin}
+        testID="LoginButton"
         customStyle={{ marginLeft: 'auto', marginRight: 'auto' }}
       />
 
@@ -110,6 +123,11 @@ const styles = StyleSheet.create({
   lottieContainer: {
     width: 50,
     height: 50
+  },
+  errorMsg: {
+    color: 'red',
+    marginBottom: 8,
+    marginLeft: 10
   },
   text: {
     marginTop: 300,
