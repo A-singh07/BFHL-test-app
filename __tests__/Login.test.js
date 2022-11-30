@@ -22,7 +22,7 @@ describe('Login Screen test', () => {
   });
 
   it("login function", () => {
-    const { getByTestId, getByPlaceholderText } = render(LoginComponent);
+    const { getByTestId, getByPlaceholderText, getByText, getAllByTestId } = render(LoginComponent);
 
     const emailInput = getByPlaceholderText(/Email/)
     const passwordInput = getByPlaceholderText(/Password/)
@@ -30,8 +30,8 @@ describe('Login Screen test', () => {
     expect(passwordInput).toBeTruthy();
 
     const textToEnter = {
-      email: "user@gmail.com",
-      password: "asd123"
+      email: "user12@mail.com",
+      password: "asd1123asdasda"
     };
 
     fireEvent.changeText(emailInput, textToEnter.email);

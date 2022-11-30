@@ -89,7 +89,7 @@ const LoginScreen = ({ navigation, ...rest }) => {
         </MotiView>
         {
           showErrors.map((error, i) =>
-            <Text key={i} style={styles.errorMsg}>{error}</Text>
+            <Text key={i} style={styles.errorMsg} testID="ErrorText">{error}</Text>
           )
         }
       </View>
